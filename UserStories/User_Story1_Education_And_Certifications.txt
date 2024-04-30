@@ -1,0 +1,21 @@
+User Story 1:
+-------------
+
+Description:
+------------
+
+Come up with test cases for education and certification around profile features in Project Mars. 
+
+Use case:
+---------
+
+As a user I would be able to show what certification and education I have done.
+So that the people that are interested in my profile can see the education and certifications I hold.
+
+Acceptance Criteria:
+--------------------
+
+o	To come up with test cases, you should cover all test paths and most test cases are covered!
+o	Provide an excel document that has the test cases you have come up with (should clearly be able to see the 	steps taken in order to carry out the test.
+o	The excel sheet should be pushed to GitHub with a pull request created.
+o	You should also carry out manual testing using the test cases you have come up with.
