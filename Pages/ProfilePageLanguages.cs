@@ -1,29 +1,68 @@
 ﻿using NLog;
 using OpenQA.Selenium;
-using ProjectMars.Constants;
-using ProjectMars.Utilities.Hooks;
+using ProjectMars.Utilities;
 
 namespace ProjectMars.Pages
 {
     /// <summary>
     /// Class for profile page language related actions.
     /// </summary>
-    public class ProfilePageLanguages : Hooks
+    public class ProfilePageLanguages : Driver
     {
+        // Constructor
+        public ProfilePageLanguages()
+        {
+        }
+        /// <summary>
+        /// Holds constants for Profile page language functionality.
+        /// </summary>
+
+        //Constants for Scenario 1. Verify user is able to add known languages with proficiency level
+        public static IWebElement AddNewButton => driver.FindElement(By.XPath("/html/body/div[1]/div/section[2]/div/div/div/div[3]/form/div[2]/div/div[2]/div/table/thead/tr/th[3]/div"));
+        public static IWebElement AddLanguageTextBox => driver.FindElement(By.XPath("/html/body/div[1]/div/section[2]/div/div/div/div[3]/form/div[2]/div/div[2]/div/div/div[1]/input"));
+        public static IWebElement SelectBasicProficiency => driver.FindElement(By.XPath("/html/body/div[1]/div/section[2]/div/div/div/div[3]/form/div[2]/div/div[2]/div/div/div[2]/select/option[2]"));
+        public static IWebElement SelectConversationalProficiency => driver.FindElement(By.XPath("/html/body/div[1]/div/section[2]/div/div/div/div[3]/form/div[2]/div/div[2]/div/div/div[2]/select/option[3]"));
+        public static IWebElement SelectFluentProficiency => driver.FindElement(By.XPath("/html/body/div[1]/div/section[2]/div/div/div/div[3]/form/div[2]/div/div[2]/div/div/div[2]/select/option[4]"));
+        public static IWebElement SelectNativeProficiency => driver.FindElement(By.XPath("/html/body/div[1]/div/section[2]/div/div/div/div[3]/form/div[2]/div/div[2]/div/div/div[2]/select/option[5]"));
+        public static IWebElement AddLanguageButton => driver.FindElement(By.XPath("/html/body/div[1]/div/section[2]/div/div/div/div[3]/form/div[2]/div/div[2]/div/div/div[3]/input[1]"));
+        public static IWebElement LastAddedLanguageAndLevel => driver.FindElement(By.XPath("//div[@class='ns-box-inner']"));
+
+        //Constants for Scenario 2. Verify user is able to edit a proficiency level from the known language  
+        public static IWebElement ClickOnTheEditButton => driver.FindElement(By.XPath("//body[1]/div[1]/div[1]/section[2]/div[1]/div[1]/div[1]/div[3]/form[1]/div[2]/div[1]/div[2]/div[1]/table[1]/tbody[last()]/tr[1]/td[3]/span[1]/i[1]"));
+        public static IWebElement SelectBasicProficiencyForEdit => driver.FindElement(By.XPath("//*[@id=\"account-profile-section\"]/div/section[2]/div/div/div/div[3]/form/div[2]/div/div[2]/div/table/tbody[last()]/tr/td/div/div[2]/select/option[2]"));
+        public static IWebElement SelectConversationalProficiencyForEdit => driver.FindElement(By.XPath("//*[@id=\"account-profile-section\"]/div/section[2]/div/div/div/div[3]/form/div[2]/div/div[2]/div/table/tbody[last()]/tr/td/div/div[2]/select/option[3]"));
+        public static IWebElement SelectFluentProficiencyForEdit => driver.FindElement(By.XPath("//*[@id=\"account-profile-section\"]/div/section[2]/div/div/div/div[3]/form/div[2]/div/div[2]/div/table/tbody[last()]/tr/td/div/div[2]/select/option[4]"));
+        public static IWebElement SelectNativeProficiencyForEdit => driver.FindElement(By.XPath("//*[@id=\"account-profile-section\"]/div/section[2]/div/div/div/div[3]/form/div[2]/div/div[2]/div/table/tbody[last()]/tr/td/div/div[2]/select/option[5]"));
+        public static IWebElement UpdateButton => driver.FindElement(By.XPath("//input[@value='Update']"));
+        public static IWebElement UpdatedLanguageAndLevel => driver.FindElement(By.XPath("//div[@class='ns-box-inner']"));
+
+        //Constants for Scenario 3. Verify user is able to edit a proficiency level from the known language  
+        public static IWebElement EditLanguageTextBox => driver.FindElement(By.XPath("//input[@placeholder='Add Language']"));
+
+        //Constants for Scenario 4. Verify user is able to delete an existing known language
+        public static IWebElement DeleteLastKnownLanguage => driver.FindElement(By.XPath("/html/body/div[1]/div/section[2]/div/div/div/div[3]/form/div[2]/div/div[2]/div/table/tbody/tr/td[3]/span[2]"));
+        public static IWebElement VerifyTheLanguageIsDeletedFromTheProfile => driver.FindElement(By.XPath("//div[@class='ns-box-inner']"));
+
+        //Constants for Scenario 5. Verify user attempting to add a language already present in the known languages list
+        public static IWebElement VerifyLanguageIsNotDuplicated => driver.FindElement(By.XPath("//div[@class='ns-box-inner']"));
+
+        //Constants for Scenario 6. Verify that the system rejects saving an empty language field with the chosen proficiency level in the language profile section
+        public static IWebElement EmptyStringDisplaysAnErrorMessage => driver.FindElement(By.XPath("/html[1]/body[1]/div[1]"));
+
+
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// Adds a language to the known laguages list.
         /// </summary>
-        /// <param name="driver"></param>
-        public void AddLanguageWithProficiencyLevel(IWebDriver driver, string language, string proficiencyLevel)
+        public void AddLanguageWithProficiencyLevel(string language, string proficiencyLevel)
         {
             try
             {
-                ProfilePageLanguageConstants.AddNewButton.Click();
-                ProfilePageLanguageConstants.AddLanguageTextBox.SendKeys(language);
+                AddNewButton.Click();
+                AddLanguageTextBox.SendKeys(language);
                 SelectProficiencyLevelForAdd(proficiencyLevel);
-                ProfilePageLanguageConstants.AddLanguageButton.Click();
+                AddLanguageButton.Click();
             }
             catch (Exception exception)
             {
@@ -33,15 +72,14 @@ namespace ProjectMars.Pages
         /// <summary>
         /// Verifies the added language with proficiency level.
         /// </summary>
-        /// <param name="driver"></param>
         /// <param name="language"></param>
         /// <param name="proficiencyLevel"></param>
-        public Boolean VerifyTheAddedLanguage(IWebDriver driver, string language, string proficiencyLevel)
+        public Boolean VerifyTheAddedLanguage(string language, string proficiencyLevel)
         {
             Boolean VerifyTheAddedLanguage = false;
-            Thread.Sleep(2000);
-            string expectedLanguageAndProficiency = ProfilePageLanguageConstants.LastAddedLanguageAndLevel.Text;
-            if (expectedLanguageAndProficiency.Contains(language) && expectedLanguageAndProficiency.Contains(proficiencyLevel))
+            Thread.Sleep(1000);
+            string expectedLanguageAndProficiency = LastAddedLanguageAndLevel.Text;
+            if (expectedLanguageAndProficiency.Contains(language + " has been added to your languages"))
             {
                 VerifyTheAddedLanguage = true;
             }
@@ -52,55 +90,39 @@ namespace ProjectMars.Pages
         /// <summary>
         /// Edits the language and/or proficiency level from the known languages list.
         /// </summary>
-        /// <param name="driver"></param>
         /// <param name="language"></param>
         /// <param name="proficiencyLevel"></param>
-        public void EditLanguageProficiencyLevel(IWebDriver driver, string language, string proficiencyLevel)
+        public void EditLanguageProficiencyLevel(string language, string proficiencyLevel)
         {
             Thread.Sleep(2000);
-            ProfilePageLanguageConstants.ClickOnTheEditButton.Click();
-            if (!language.Equals("existing", StringComparison.OrdinalIgnoreCase))
+            ClickOnTheEditButton.Click();
+            if (!language.Equals("language", StringComparison.OrdinalIgnoreCase))
             {
-                ProfilePageLanguageConstants.EditLanguageTextBox.Clear();
-                ProfilePageLanguageConstants.EditLanguageTextBox.SendKeys(language);
+                EditLanguageTextBox.Clear();
+                EditLanguageTextBox.SendKeys(language);
             }
             Thread.Sleep(2000);
             SelectProficiencyLevelForEdit(proficiencyLevel);
-            ProfilePageLanguageConstants.UpdateButton.Click();
+            UpdateButton.Click();
         }
 
         /// <summary>
         /// Verifies the updated language with proficiency level.
         /// </summary>
-        /// <param name="driver"></param>
         /// <param name="language"></param>
         /// <param name="proficiencyLevel"></param>
-        public Boolean VerifyUpdatedLanguageProficiencyLevel(IWebDriver driver, string language, string proficiencyLevel)
+        public Boolean VerifyUpdatedLanguageProficiencyLevel(string language, string proficiencyLevel)
         {
             Boolean VerifyUpdatedLanguageProficiencyLevel = false;
             Thread.Sleep(2000);
-            string updatedLanguageAndProficiency = ProfilePageLanguageConstants.UpdatedLanguageAndLevel.Text;
-            if (language.Equals("existing", StringComparison.OrdinalIgnoreCase))
+            string updatedLanguageAndProficiency = UpdatedLanguageAndLevel.Text;
+            if (updatedLanguageAndProficiency.Contains(language))
             {
-                if (updatedLanguageAndProficiency.Contains(proficiencyLevel))
-                {
-                    VerifyUpdatedLanguageProficiencyLevel = true; 
-                }
-                else
-                {
-                    VerifyUpdatedLanguageProficiencyLevel = false;
-                }
+                VerifyUpdatedLanguageProficiencyLevel = true;
             }
             else
             {
-                if (updatedLanguageAndProficiency.Contains(language) && updatedLanguageAndProficiency.Contains(proficiencyLevel))
-                {
-                    VerifyUpdatedLanguageProficiencyLevel = true;
-                }
-                else
-                {
-                    VerifyUpdatedLanguageProficiencyLevel = false;
-                }
+                VerifyUpdatedLanguageProficiencyLevel = false;
             }
 
             return VerifyUpdatedLanguageProficiencyLevel;
@@ -109,22 +131,22 @@ namespace ProjectMars.Pages
         /// <summary>
         /// Deletes the language from the known languages list.
         /// </summary>
-        /// <param name="driver"></param>
-        public void DeleteLanguage(IWebDriver driver, string language)
+        /// <param name="language"></param>
+        public void DeleteLanguage(string language)
         {
-            ProfilePageLanguageConstants.DeleteLastKnownLanguage.Click();
+            Thread.Sleep(5000);
+            DeleteLastKnownLanguage.Click();
         }
 
         /// <summary>
         /// Verifies the language is deleted. 
         /// </summary>
-        /// <param name="driver"></param>
         /// <param name="language"></param>
-        public Boolean VerifyTheLanguageIsDeleted(IWebDriver driver, string language)
+        public Boolean VerifyTheLanguageIsDeleted(string language)
         {
             Boolean VerifyTheLanguageIsDeleted = false;
-            Wait(driver, 2);
-            if (ProfilePageLanguageConstants.VerifyTheLanguageIsDeleted.Text.Contains("has been deleted from your languages", StringComparison.OrdinalIgnoreCase))
+            Thread.Sleep(1500);
+            if (VerifyTheLanguageIsDeletedFromTheProfile.Text.Contains("has been deleted from your languages", StringComparison.OrdinalIgnoreCase))
             {
                 VerifyTheLanguageIsDeleted = true;
             }
@@ -135,28 +157,28 @@ namespace ProjectMars.Pages
         /// <summary>
         /// Adds a duplicated language to the known languages list.
         /// </summary>
+        /// <param name="language"></param>
         /// <param name="proficiencyLevel"></param>
-        public void DuplicatedLanguage(IWebDriver driver, string language, string proficiencyLevel)
+        public void DuplicatedLanguage(string language, string proficiencyLevel)
         {
-                Thread.Sleep(2000);
-                ProfilePageLanguageConstants.AddNewButton.Click();
-                Thread.Sleep(2000);
-                ProfilePageLanguageConstants.AddLanguageTextBox.SendKeys(language);
-                Thread.Sleep(2000);
-                SelectProficiencyLevelForAdd(proficiencyLevel);
-                ProfilePageLanguageConstants.AddLanguageButton.Click();      
+            Thread.Sleep(2000);
+            AddNewButton.Click();
+            Thread.Sleep(2000);
+            AddLanguageTextBox.SendKeys(language);
+            Thread.Sleep(2000);
+            SelectProficiencyLevelForAdd(proficiencyLevel);
+            AddLanguageButton.Click();
         }
 
         /// <summary>
         /// Verifies if the language has been duplicated.
         /// </summary>
-        /// <param name="driver"></param>
         /// <param name="language"></param>
-        public Boolean VerifyLanguageNotDuplicated(IWebDriver driver, string language)
+        public Boolean VerifyLanguageNotDuplicated(string language)
         {
             Boolean VerifyLanguageNotDuplicated = false;
-            Thread.Sleep(2000);
-            if (ProfilePageLanguageConstants.VerifyLanguageNotDuplicated.Text.Contains("is already exist in your language list.", StringComparison.OrdinalIgnoreCase))
+            Thread.Sleep(5000);
+            if (VerifyLanguageIsNotDuplicated.Text.Contains("is already exist in your language list.", StringComparison.OrdinalIgnoreCase))
             {
                 VerifyLanguageNotDuplicated = true;
             }
@@ -167,52 +189,92 @@ namespace ProjectMars.Pages
         /// <summary>
         /// Verifies if a language is passed as an empty string displays an error message. 
         /// </summary>
-        /// <param name="driver"></param>
         /// <param name="language"></param>
-        public Boolean EmptyStringDisplayAnErrorMessage(IWebDriver driver, string language)
+        public Boolean EmptyStringDisplayAnErrorMessage(string language)
         {
             Boolean EmptyStringDisplayAnErrorMessage = false;
             Thread.Sleep(3000);
-            if (ProfilePageLanguageConstants.EmptyStringDisplayAnErrorMessage.Text.Contains("Please enter language and level", StringComparison.OrdinalIgnoreCase))
+            if (EmptyStringDisplaysAnErrorMessage.Text.Contains("Please enter language and level", StringComparison.OrdinalIgnoreCase))
             {
                 EmptyStringDisplayAnErrorMessage = true;
             }
- 
+
             return EmptyStringDisplayAnErrorMessage;
         }
 
         /// <summary>
         /// Verifies the language with the same name but different cases.
         /// </summary>
-        /// <param name="driver"></param>
         /// <param name="language"></param>
         /// <param name="proficiencyLevel"></param>
-        public void LanguageWithSameNameButdifferentCases(IWebDriver driver, string language, string proficiencyLevel)
+        public void LanguageWithSameNameButdifferentCases(string language, string proficiencyLevel)
         {
             Thread.Sleep(2000);
-            ProfilePageLanguageConstants.AddNewButton.Click();
-            ProfilePageLanguageConstants.AddLanguageTextBox.SendKeys(language);
+            AddNewButton.Click();
+            AddLanguageTextBox.SendKeys(language);
             SelectProficiencyLevelForAdd(proficiencyLevel);
-            ProfilePageLanguageConstants.AddLanguageButton.Click();
+            AddLanguageButton.Click();
+        }
+
+        /// <summary>
+        /// Verifies the language field with the numbers.
+        /// </summary>
+        /// <param name="language"></param>
+        /// <param name="proficiencyLevel"></param>
+        public void LanguageFieldContainsNumber(string language, string proficiencyLevel)
+        {
+            Thread.Sleep(1000);
+            AddNewButton.Click();
+            AddLanguageTextBox.SendKeys(language);
+            SelectProficiencyLevelForAdd(proficiencyLevel);
+            AddLanguageButton.Click();
+        }
+
+        /// <summary>
+        /// Verifies the language field with special characters.
+        /// </summary>
+        /// <param name="language"></param>
+        /// <param name="proficiencyLevel"></param>
+        public void LanguageFieldContainsSpecialCharacter(string language, string proficiencyLevel)
+        {
+            Thread.Sleep(1000);
+            AddNewButton.Click();
+            AddLanguageTextBox.SendKeys(language);
+            SelectProficiencyLevelForAdd(proficiencyLevel);
+            AddLanguageButton.Click();
+        }
+
+        /// <summary>
+        /// Verifies the language with invalid proficiency level.
+        /// </summary>
+        /// <param name="language"></param>
+        /// <param name="proficiencyLevel"></param>
+        public void InvalidProficiencyLevel(string language, string proficiencyLevel)
+        {
+            Thread.Sleep(1000);
+            AddNewButton.Click();
+            AddLanguageTextBox.SendKeys(language);
+            SelectProficiencyLevelForAdd(proficiencyLevel);
+            AddLanguageButton.Click();
         }
 
         private void SelectProficiencyLevelForAdd(string proficiencyLevel)
         {
             if (proficiencyLevel.Equals("basic", StringComparison.OrdinalIgnoreCase))
             {
-                ProfilePageLanguageConstants.SelectBasicProficiency.Click();
+                SelectBasicProficiency.Click();
             }
             if (proficiencyLevel.Equals("conversational", StringComparison.OrdinalIgnoreCase))
             {
-                ProfilePageLanguageConstants.SelectConversationalProficiency.Click();
+                SelectConversationalProficiency.Click();
             }
             if (proficiencyLevel.Equals("fluent", StringComparison.OrdinalIgnoreCase))
             {
-                ProfilePageLanguageConstants.SelectFluentProficiency.Click();
+                SelectFluentProficiency.Click();
             }
             if (proficiencyLevel.Equals("native", StringComparison.OrdinalIgnoreCase))
             {
-                ProfilePageLanguageConstants.SelectNativeProficiency.Click();
+                SelectNativeProficiency.Click();
             }
         }
 
@@ -220,20 +282,21 @@ namespace ProjectMars.Pages
         {
             if (proficiencyLevel.Equals("basic", StringComparison.OrdinalIgnoreCase))
             {
-                ProfilePageLanguageConstants.SelectBasicProficiencyForEdit.Click();
+                SelectBasicProficiencyForEdit.Click();
             }
             if (proficiencyLevel.Equals("conversational", StringComparison.OrdinalIgnoreCase))
             {
-                ProfilePageLanguageConstants.SelectConversationalProficiencyForEdit.Click();
+                SelectConversationalProficiencyForEdit.Click();
             }
             if (proficiencyLevel.Equals("fluent", StringComparison.OrdinalIgnoreCase))
             {
-                ProfilePageLanguageConstants.SelectFluentProficiencyForEdit.Click();
+                SelectFluentProficiencyForEdit.Click();
             }
             if (proficiencyLevel.Equals("native", StringComparison.OrdinalIgnoreCase))
             {
-                ProfilePageLanguageConstants.SelectNativeProficiencyForEdit.Click();
+                SelectNativeProficiencyForEdit.Click();
             }
         }
+
     }
 }

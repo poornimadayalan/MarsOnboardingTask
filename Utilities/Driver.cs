@@ -28,7 +28,6 @@ public class Driver
         driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(timeInSeconds);
     }
 
-
     /// <summary>
     /// Navigates to the application URL.
     /// </summary>

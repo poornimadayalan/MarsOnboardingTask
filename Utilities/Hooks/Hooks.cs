@@ -1,6 +1,4 @@
-﻿using TechTalk.SpecFlow;
-
-namespace ProjectMars.Utilities.Hooks
+﻿namespace ProjectMars.Utilities.Hooks
 {
     /// <summary>
     /// Class containing setup and clean-up actions.

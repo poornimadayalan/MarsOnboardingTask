@@ -1,40 +1,74 @@
 ﻿using NLog;
 using OpenQA.Selenium;
-using ProjectMars.Constants;
-using ProjectMars.Utilities.Hooks;
+using ProjectMars.Utilities;
 
 namespace ProjectMars.Pages
 {
     /// <summary>
     /// Class for profile page related actions.
     /// </summary>
-    public class ProfilePageSkills : Hooks
+    public class ProfilePageSkills : Driver
     {
+        // <summary>
+        /// Holds constants for Profile page skill functionality.
+        /// </summary>
+
+        //Constants for Scenario 1. Verify user is able to add known skills with experience level
+        public static IWebElement SkillFeatureButton => driver.FindElement(By.XPath("//*[@id=\"account-profile-section\"]/div/section[2]/div/div/div/div[3]/form/div[1]/a[2]"));
+        public static IWebElement AddNewSkillButton => driver.FindElement(By.XPath("//div[@class='ui teal button']"));
+        public static IWebElement AddSkillTextBox => driver.FindElement(By.XPath("//input[@placeholder='Add Skill']"));
+        public static IWebElement SelectBeginnerProficiency => driver.FindElement(By.XPath("//option[@value='Beginner']"));
+        public static IWebElement SelectIntermediateProficiency => driver.FindElement(By.XPath("//option[@value='Intermediate']"));
+        public static IWebElement SelectExpertProficiency => driver.FindElement(By.XPath("//option[@value='Expert']"));
+        public static IWebElement AddSkillButton => driver.FindElement(By.XPath("//input[@value='Add']"));
+        public static IWebElement LastAddedSkillAndLevel => driver.FindElement(By.XPath("//div[@class='ns-box-inner']"));
+
+        //Constants for Scenario 2. Verify user is able to edit an existing known skill with experience level
+        public static IWebElement EditSkillButton => driver.FindElement(By.XPath("//body[1]/div[1]/div[1]/section[2]/div[1]/div[1]/div[1]/div[3]/form[1]/div[3]/div[1]/div[2]/div[1]/table[1]/tbody[last()]/tr[1]/td[3]/span[1]"));
+        public static IWebElement SelectBeginnerExperienceForEdit => driver.FindElement(By.XPath("/html/body/div[1]/div/section[2]/div/div/div/div[3]/form/div[3]/div/div[2]/div/table/tbody/tr/td/div/div[2]/select/option[2]"));
+        public static IWebElement SelectIntermediateExperienceForEdit => driver.FindElement(By.XPath("/html/body/div[1]/div/section[2]/div/div/div/div[3]/form/div[3]/div/div[2]/div/table/tbody/tr/td/div/div[2]/select/option[3]"));
+        public static IWebElement SelectExpertExperienceForEdit => driver.FindElement(By.XPath("/html/body/div[1]/div/section[2]/div/div/div/div[3]/form/div[3]/div/div[2]/div/table/tbody/tr/td/div/div[2]/select/option[4]"));
+        public static IWebElement UpdateSkillButton => driver.FindElement(By.XPath("//*[@id=\"account-profile-section\"]/div/section[2]/div/div/div/div[3]/form/div[3]/div/div[2]/div/table/tbody[last()]/tr/td/div/span/input[1]"));
+        public static IWebElement UpdatedSkillAndLevel => driver.FindElement(By.XPath("//div[@class='ns-box-inner']"));
+
+        //Constants for Scenario 3. Verify user is able to edit a experience level from the known language
+        public static IWebElement EditSkillTextBox => driver.FindElement(By.XPath("//*[@id=\"account-profile-section\"]/div/section[2]/div/div/div/div[3]/form/div[3]/div/div[2]/div/table/tbody[last()]/tr/td/div/div[1]/input"));
+
+        //Constants for Scenario 4. Verify user is able to delete an existing known skill
+        public static IWebElement DeleteLastKnownSkill => driver.FindElement(By.XPath("/html/body/div[1]/div/section[2]/div/div/div/div[3]/form/div[3]/div/div[2]/div/table/tbody[last()]/tr/td[3]/span[2]"));
+        public static IWebElement VerifyTheSkillIsDeletedFromTheProfile => driver.FindElement(By.XPath("//div[@class='ns-box-inner']"));
+
+        //Constants for Scenario 5. Verify user attempting to add a language already present in the known languages list
+        public static IWebElement VerifySkillIsNotDuplicated => driver.FindElement(By.XPath("//div[@class='ns-box-inner']"));
+
+        //Constants for Scenario 6. Verify that the system rejects saving an empty skill field with the chosen experience level in the skill profile section
+        public static IWebElement EmptyStringDisplayAnErrorMessageInTheSkillList => driver.FindElement(By.XPath("/html[1]/body[1]/div[1]"));
+
+
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// Selects the skill feature from the my profile page
         /// </summary>
         /// <param name="driver"></param>
-        public void ClickOnTheSkillFeature(IWebDriver driver)
+        public void ClickOnTheSkillFeature()
         {
-            ProfilePageSkillConstants.skillFeatureButton.Click();
+            SkillFeatureButton.Click();
         }
 
         /// <summary>
         /// Adds a skills to the known skills list.
         /// </summary>
-        /// <param name="driver"></param>
         /// <param name="skill"></param>
         /// <param name="experienceLevel"></param>
-        public void AddSkillsWithExperienceLevel(IWebDriver driver, string skill, string experienceLevel)
+        public void AddSkillsWithExperienceLevel(string skill, string experienceLevel)
         {
             try
             {
-                ProfilePageSkillConstants.addNewSkillButton.Click();
-                ProfilePageSkillConstants.addSkillTextBox.SendKeys(skill);
-                selectExperienceLevelForAdd(experienceLevel);
-                ProfilePageSkillConstants.addSkillButton.Click();
+                AddNewSkillButton.Click();
+                AddSkillTextBox.SendKeys(skill);
+                SelectExperienceLevelForAdd(experienceLevel);
+                AddSkillButton.Click();
             }
             catch (Exception exception)
             {
@@ -45,17 +79,16 @@ namespace ProjectMars.Pages
         /// <summary>
         /// Verifies the added skill with experiance level.
         /// </summary>
-        /// <param name="driver"></param>
         /// <param name="skill"></param>
         /// <param name="experienceLevel"></param>
-        public Boolean VerifyTheAddedSkill(IWebDriver driver, string skill, string experienceLevel)
+        public Boolean VerifyTheAddedSkill(string skill, string experienceLevel)
         {
             Boolean VerifyTheAddedSkill = false;
             Thread.Sleep(5000);
-            string expectedSkillAndExperience = ProfilePageSkillConstants.lastAddedSkillAndLevel.Text;
-            if (expectedSkillAndExperience.Contains(skill) && expectedSkillAndExperience.Contains(experienceLevel))
+            string expectedSkillAndExperience = LastAddedSkillAndLevel.Text;
+            if (expectedSkillAndExperience.Contains(skill + " has been added to your skills"))
             {
-                VerifyTheAddedSkill = true; 
+                VerifyTheAddedSkill = true;
             }
 
             return VerifyTheAddedSkill;
@@ -64,55 +97,39 @@ namespace ProjectMars.Pages
         /// <summary>
         /// Edits the skill and/or experiance level from the known skills list.
         /// </summary>
-        /// <param name="driver"></param>
         /// <param name="skill"></param>
         /// <param name="experienceLevel"></param>
-        public void EditSkillExperienceLevel(IWebDriver driver, string skill, string experienceLevel)
+        public void EditSkillExperienceLevel(string skill, string experienceLevel)
         {
             Thread.Sleep(2000);
-            ProfilePageSkillConstants.editSkillButton.Click();
-            if (!skill.Equals("existing", StringComparison.OrdinalIgnoreCase))
+            EditSkillButton.Click();
+            if (!skill.Equals("skill", StringComparison.OrdinalIgnoreCase))
             {
-                ProfilePageSkillConstants.editSkillTextBox.Clear();
-                ProfilePageSkillConstants.editSkillTextBox.SendKeys(skill);
+                EditSkillTextBox.Clear();
+                EditSkillTextBox.SendKeys(skill);
             }
             Thread.Sleep(2000);
-            selectExperienceLevelForEdit(experienceLevel);
-            ProfilePageSkillConstants.updateSkillButton.Click();
+            SelectExperienceLevelForEdit(experienceLevel);
+            UpdateSkillButton.Click();
         }
 
         /// <summary>
         /// Verifies the updated skill with experience level.
         /// </summary>
-        /// <param name="driver"></param>
         /// <param name="skill"></param>
         /// <param name="experienceLevel"></param>
-        public Boolean VerifytheUpdatedSkillExperienceLevel(IWebDriver driver, string skill, string experienceLevel)
+        public Boolean VerifytheUpdatedSkillExperienceLevel(string skill, string experienceLevel)
         {
             Boolean VerifytheUpdatedSkillExperienceLevel = false;
             Thread.Sleep(2000);
-            string updatedSkillAndExperience = ProfilePageSkillConstants.updatedSkillAndLevel.Text;
-            if (skill.Equals("existing", StringComparison.OrdinalIgnoreCase))
+            string updatedSkillAndExperience = UpdatedSkillAndLevel.Text;
+            if (updatedSkillAndExperience.Contains(skill))
             {
-                if (updatedSkillAndExperience.Contains(experienceLevel))
-                {
-                    VerifytheUpdatedSkillExperienceLevel = true;
-                }
-                else
-                {
-                    VerifytheUpdatedSkillExperienceLevel = false;
-                }
+                VerifytheUpdatedSkillExperienceLevel = true;
             }
             else
             {
-                if (updatedSkillAndExperience.Contains(skill) && updatedSkillAndExperience.Contains(experienceLevel))
-                {
-                    VerifytheUpdatedSkillExperienceLevel = true;
-                }
-                else
-                {
-                    VerifytheUpdatedSkillExperienceLevel = false;
-                }
+                VerifytheUpdatedSkillExperienceLevel = false;
             }
 
             return VerifytheUpdatedSkillExperienceLevel;
@@ -121,23 +138,22 @@ namespace ProjectMars.Pages
         /// <summary>
         /// Deletes the skill from the known skills list.
         /// </summary>
-        /// <param name="driver"></param>
-        public void DeleteSkill(IWebDriver driver, string skill)
+        /// /// <param name="skill"></param>
+        public void DeleteSkill(string skill)
         {
-            ProfilePageSkillConstants.deleteLastKnownSkill.Click();
-            Thread.Sleep(2000);
+            Thread.Sleep(5000);
+            DeleteLastKnownSkill.Click();
         }
 
         /// <summary>
         /// Verifies the skill is deleted.
         /// </summary>
-        /// <param name="driver"></param>
         /// <param name="skill"></param>
-        public Boolean verifyTheSkillIsDeleted(IWebDriver driver, string skill)
+        public Boolean VerifyTheSkillIsDeleted(string skill)
         {
             Boolean verifyTheSkillIsDeleted = false;
             Thread.Sleep(3000);
-            if (ProfilePageSkillConstants.verifyTheSkillIsDeleted.Text.Contains("has been deleted", StringComparison.OrdinalIgnoreCase))
+            if (VerifyTheSkillIsDeletedFromTheProfile.Text.Contains("has been deleted", StringComparison.OrdinalIgnoreCase))
             {
                 verifyTheSkillIsDeleted = true;
             }
@@ -148,104 +164,136 @@ namespace ProjectMars.Pages
         /// <summary>
         /// Adds a duplicated skill to the known languages list.
         /// </summary>
-        /// <param name="driver"></param>
         /// <param name="skill"></param>
         /// <param name="experienceLevel"></param>
-        public void DuplicatedSkill(IWebDriver driver, string skill, string experienceLevel)
+        public void DuplicatedSkill(string skill, string experienceLevel)
         {
             Thread.Sleep(2000);
-            ProfilePageSkillConstants.addNewSkillButton.Click();
-            Thread.Sleep(2000);
-            ProfilePageSkillConstants.addSkillTextBox.SendKeys(skill);
-            Thread.Sleep(2000);
-            selectExperienceLevelForAdd(experienceLevel);
-            ProfilePageSkillConstants.addSkillButton.Click();
+            AddNewSkillButton.Click();
+            Thread.Sleep(1000);
+            AddSkillTextBox.SendKeys(skill);
+            Thread.Sleep(1000);
+            SelectExperienceLevelForAdd(experienceLevel);
+            AddSkillButton.Click();
         }
 
         /// <summary>
         /// Verifies if the skill has been duplicated.
         /// </summary>
-        /// <param name="driver"></param>
         /// <param name="skill"></param>
-        public Boolean VerifySkillNotDuplicated(IWebDriver driver, string skill)
+        public Boolean VerifySkillNotDuplicated(string skill)
         {
             Boolean VerifySkillNotDuplicated = false;
             Thread.Sleep(2000);
-            if (ProfilePageSkillConstants.verifySkillNotDuplicated.Text.Contains("is already exist in your skill list.", StringComparison.OrdinalIgnoreCase))
+            if (VerifySkillIsNotDuplicated.Text.Contains("This skill is already exist in your skill list.", StringComparison.OrdinalIgnoreCase))
             {
-                VerifySkillNotDuplicated = true;  
+                VerifySkillNotDuplicated = true;
             }
-            
+
             return VerifySkillNotDuplicated;
         }
 
         /// <summary>
         /// Verifies the skill with the same name but different cases.
         /// </summary>
-        /// <param name="driver"></param>
         /// <param name="skill"></param>
         /// <param name="experienceLevel"></param>
-        public void skillWithSameNameButdifferentCases(IWebDriver driver, string skill, string experienceLevel)
+        public void SkillWithSameNameButdifferentCases(string skill, string experienceLevel)
         {
-                Thread.Sleep(2000);
-                ProfilePageSkillConstants.addNewSkillButton.Click();
-                ProfilePageSkillConstants.addSkillTextBox.SendKeys(skill);
-                selectExperienceLevelForAdd(experienceLevel);
-                ProfilePageSkillConstants.addSkillButton.Click();
+            Thread.Sleep(2000);
+            AddNewSkillButton.Click();
+            AddSkillTextBox.SendKeys(skill);
+            SelectExperienceLevelForAdd(experienceLevel);
+            AddSkillButton.Click();
         }
-   
+
         /// <summary>
-        ///  Verifies if a skill is passed as an empty string displays an error message. 
+        /// Verifies if a skill is passed as an empty string displays an error message. 
         /// </summary>
-        /// <param name="driver"></param>
         /// <param name="skill"></param>
-        public Boolean EmptyStringDisplayAnErrorMessageInTheSkill(IWebDriver driver, string skill)
+        /// <returns></returns>
+        public Boolean EmptyStringDisplayAnErrorMessageInTheSkill(string skill)
         {
             Boolean EmptyStringDisplayAnErrorMessageInTheSkill = false;
             Thread.Sleep(3000);
-            if (ProfilePageSkillConstants.emptyStringDisplayAnErrorMessageInTheSkill.Text.Contains("Please enter skill and experience" + " level", StringComparison.OrdinalIgnoreCase))
+            if (EmptyStringDisplayAnErrorMessageInTheSkillList.Text.Contains("Please enter skill and experience" + " level", StringComparison.OrdinalIgnoreCase))
             {
                 EmptyStringDisplayAnErrorMessageInTheSkill = true;
             }
-            
+
             return EmptyStringDisplayAnErrorMessageInTheSkill;
         }
 
         /// <summary>
-        /// 
+        /// Verifies the skill field contains only numbers.
         /// </summary>
-        /// <param name="driver"></param>
         /// <param name="skill"></param>
-        /// 
-        private void selectExperienceLevelForAdd(string experienceLevel)
+        /// <param name="experienceLevel"></param>
+        public void SkillFieldWithNumbers(string skill, string experienceLevel)
+        {
+            Thread.Sleep(1000);
+            AddNewSkillButton.Click();
+            AddSkillTextBox.SendKeys(skill);
+            SelectExperienceLevelForAdd(experienceLevel);
+            AddSkillButton.Click();
+        }
+        /// <summary>
+        ///  Verifies the skill field with special characters.
+        /// </summary>
+        /// <param name="skill"></param>
+        /// <param name="experienceLevel"></param>
+        public void SkillFieldWithSpecialCharacters(string skill, string experienceLevel)
+        {
+            Thread.Sleep(1000);
+            AddNewSkillButton.Click();
+            AddSkillTextBox.SendKeys(skill);
+            SelectExperienceLevelForAdd(experienceLevel);
+            AddSkillButton.Click();
+        }
+
+        /// <summary>
+        /// Verifies the skill with invalid experience level.
+        /// </summary>
+        /// <param name="skill"></param>
+        /// <param name="experienceLevel"></param>
+        public void InValidExperienceLevel(string skill, string experienceLevel)
+        {
+            Thread.Sleep(1000);
+            AddNewSkillButton.Click();
+            AddSkillTextBox.SendKeys(skill);
+            SelectExperienceLevelForAdd(experienceLevel);
+            AddSkillButton.Click();
+        }
+
+        private void SelectExperienceLevelForAdd(string experienceLevel)
         {
             if (experienceLevel.Equals("beginner", StringComparison.OrdinalIgnoreCase))
             {
-                ProfilePageSkillConstants.selectBeginnerProficiency.Click();
+                SelectBeginnerProficiency.Click();
             }
             if (experienceLevel.Equals("intermediate", StringComparison.OrdinalIgnoreCase))
             {
-                ProfilePageSkillConstants.selectIntermediateProficiency.Click();
+                SelectIntermediateProficiency.Click();
             }
             if (experienceLevel.Equals("expert", StringComparison.OrdinalIgnoreCase))
             {
-                ProfilePageSkillConstants.selectExpertProficiency.Click();
+                SelectExpertProficiency.Click();
             }
         }
 
-        private void selectExperienceLevelForEdit(string experienceLevel)
+        private void SelectExperienceLevelForEdit(string experienceLevel)
         {
             if (experienceLevel.Equals("beginner", StringComparison.OrdinalIgnoreCase))
             {
-                ProfilePageSkillConstants.selectBeginnerExperienceForEdit.Click();
+                SelectBeginnerExperienceForEdit.Click();
             }
             if (experienceLevel.Equals("intermediate", StringComparison.OrdinalIgnoreCase))
             {
-                ProfilePageSkillConstants.selectIntermediateExperienceForEdit.Click();
+                SelectIntermediateExperienceForEdit.Click();
             }
             if (experienceLevel.Equals("expert", StringComparison.OrdinalIgnoreCase))
             {
-                ProfilePageSkillConstants.selectExpertExperienceForEdit.Click();
+                SelectExpertExperienceForEdit.Click();
             }
         }
     }
